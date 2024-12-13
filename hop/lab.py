@@ -53,3 +53,13 @@ def get_client(id):
             "data": client.to_dict()
         }
     ), 200
+    
+@app.route("/client", methods=['POST'])
+def add_client():
+    if not request.is_json:
+        return jsonify(
+            {
+                "success": False,
+                "error": "Content-type must be application/json"
+            }
+        ), 400
