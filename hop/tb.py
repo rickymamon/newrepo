@@ -54,3 +54,22 @@ def test_get_client(client):
         json_data = response.get_json()
         assert json_data["success"] is True
         assert json_data["data"]["id"] == 1
+
+
+def test_delete_client(client):
+    mock_client = Client(
+        id=1,
+        first_name="John",
+        last_name="Doe",
+        address="Rizal",
+        contact="09123456789",
+        email="rick716@gmail.com"
+    )
+
+    with patch("app.Client.query.get") as mock_get, \
+         patch("app.db.session.delete"), \
+         patch("app.db.session.commit"):
+        mock_get.return_value = mock_client
+        response = client.delete("/client/1")
+        assert response.status_code == 204
+        assert response.data == b''
