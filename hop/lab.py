@@ -63,3 +63,6 @@ def add_client():
                 "error": "Content-type must be application/json"
             }
         ), 400
+        
+    data = request.get_json()
+    required_fields = ["first_name", "last_name", "address", "contact", "email"]
