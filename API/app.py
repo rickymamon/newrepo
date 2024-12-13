@@ -1,10 +1,9 @@
-from flask import Flask, jsonify, request
+from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqlconnector://root:root@127.0.0.1/school'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysql-connector://root:admin@127.0.0.1/mydb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -24,39 +23,39 @@ class Client(db.Model):
             "first_name": self.first_name,
             "last_name": self.last_name,
             "address": self.address,
-            "contact":self.contact,
+            "contact": self.contact,
             "email": self.email,
         }
 
-@app.route("/students", methods=["GET"])
-def get_Client():
-    Client = Client.query.limit(100)
+@app.route("/client", methods=["GET"])
+def get_clients():
+    clients = Client.query
     return jsonify(
         {
             "success": True,
-            "data": [student.to_dict() for student in students]
+            "data": [client.to_dict() for client in clients]
         }
     ), 200
 
-@app.route("/students/<int:id>", methods=['GET'])
-def get_student(id):
-    student = db.session.get(Students, id)
-    if not student:
+@app.route("/client/<int:id>", methods=['GET'])
+def get_client(id):
+    client = db.session.get(Client, id)
+    if not client:
         return jsonify(
             {
                 "success": False,
-                "error": "Student not found"
+                "error": "Client not found"
             }
         ), 404
     return jsonify(
         {
             "success": True,
-            "data": student.to_dict()
+            "data": client.to_dict()
         }
     ), 200
 
-@app.route("/students", methods=['POST'])
-def add_student():
+@app.route("/client", methods=['POST'])
+def add_client():
     if not request.is_json:
         return jsonify(
             {
@@ -65,7 +64,7 @@ def add_student():
             }
         ), 400
     data = request.get_json()
-    required_fields = ["student_number", "first_name", "middle_name", "last_name", "gender", "birthday"]
+    required_fields = ["first_name", "last_name", "address", "contact", "email"]
 
     for field in required_fields:
         if field not in data:
@@ -77,14 +76,14 @@ def add_student():
             ), 400
 
     try:
-        new_student = Client(
+        new_client = Client(
             first_name=data["first_name"],
             last_name=data["last_name"],
-            address=data["gender"],
+            address=data["address"],
             contact=data["contact"],
-            email=data["contact"],
+            email=data["email"],
         )
-        db.session.add(new_student)
+        db.session.add(new_client)
         db.session.commit()
     except Exception as e:
         return jsonify(
@@ -97,51 +96,55 @@ def add_student():
     return jsonify(
         {
             "success": True,
-            "data": new_student.to_dict()
+            "data": new_client.to_dict()
         }
     ), 201
 
-@app.route("/students/<int:id>", methods=["PUT"])
-def update_student(id):
-    student = db.session.get(Students, id)
-    if not student:
+@app.route("/client/<int:id>", methods=["PUT"])
+def update_client(id):
+    client = db.session.get(Client, id)
+    if not client:
         return jsonify(
             {
                 "success": False,
-                "error": "Student not found"
+                "error": "Client not found"
             }
         ), 404
 
     data = request.get_json()
     updatable_fields = ["first_name", "last_name", "address", "contact", "email"]
 
+    for field in updatable_fields:
+        if field in data:
+            setattr(client, field, data[field])
+
     db.session.commit()
     return jsonify(
         {
             "success": True,
-            "data": student.to_dict()
+            "data": client.to_dict()
         }
     ), 200
 
-@app.route("/students/<int:id>", methods=["DELETE"])
-def delete_student(id):
-    student = db.session.get(Client, id)
-    if not student:
+@app.route("/client/<int:id>", methods=["DELETE"])
+def delete_client(id):
+    client = db.session.get(Client, id)
+    if not client:
         return jsonify(
             {
                 "success": False,
-                "error": "Student not found"
+                "error": "Client not found"
             }
         ), 404
-    db.session.delete(student)
+    db.session.delete(client)
     db.session.commit()
 
     return jsonify(
         {
             "success": True,
-            "message": "Student successfully deleted" 
+            "message": "Client successfully deleted"
         }
-    ), 204
+    ), 200
 
 if __name__ == '__main__':
     app.run(debug=True)
