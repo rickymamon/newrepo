@@ -27,3 +27,12 @@ class Client(db.Model):
             "contact":self.contact,
             "email": self.email,
         }
+@app.route("/client", methods=["GET"])
+def get_Client():
+    Client = Client.query
+    return jsonify(
+        {
+            "success": True,
+            "data": [Client.to_dict() for Client in Client]
+        }
+    ), 200
