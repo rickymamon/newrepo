@@ -36,3 +36,21 @@ def test_get_clients(client):
         json_data = response.get_json()
         assert json_data["success"] is True
         assert len(json_data["data"]) == len(mock_clients)
+
+def test_get_client(client):
+    mock_client = Client(
+        id=1,
+        first_name="John",
+        last_name="Doe",
+        address="Rizal",
+        contact="098372764",
+        email="ricky@gmail.com"
+    )
+
+    with patch("app.Client.query.get") as mock_get:
+        mock_get.return_value = mock_client
+        response = client.get("/client/1")
+        assert response.status_code == 200
+        json_data = response.get_json()
+        assert json_data["success"] is True
+        assert json_data["data"]["id"] == 1
