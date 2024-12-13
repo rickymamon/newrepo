@@ -101,3 +101,16 @@ def add_client():
             "data": new_client.to_dict()
         }
     ), 201
+@app.route("/client/<int:id>", methods=["PUT"])
+def update_client(id):
+    client = db.session.get(Client, id)
+    if not client:
+        return jsonify(
+            {
+                "success": False,
+                "error": "Client not found"
+            }
+        ), 404
+
+    data = request.get_json()
+    updatable_fields = ["first_name", "last_name", "address", "contact", "email"]
