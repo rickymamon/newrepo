@@ -126,3 +126,14 @@ def update_client(id):
             "data": client.to_dict()
         }
     ), 200
+
+@app.route("/client/<int:id>", methods=["DELETE"])
+def delete_client(id):
+    client = db.session.get(Client, id)
+    if not client:
+        return jsonify(
+            {
+                "success": False,
+                "error": "Client not found"
+            }
+        ), 404
