@@ -36,3 +36,20 @@ def get_Client():
             "data": [Client.to_dict() for Client in Client]
         }
     ), 200
+    
+@app.route("/client/<int:id>", methods=['GET'])
+def get_client(id):
+    client = db.session.get(Client, id)
+    if not client:
+        return jsonify(
+            {
+                "success": False,
+                "error": "Client not found"
+            }
+        ), 404
+    return jsonify(
+        {
+            "success": True,
+            "data": client.to_dict()
+        }
+    ), 200
