@@ -66,3 +66,38 @@ def add_client():
         
     data = request.get_json()
     required_fields = ["first_name", "last_name", "address", "contact", "email"]
+    
+    
+    for field in required_fields:
+        if field not in data:
+            return jsonify(
+                {
+                    "success": False,
+                    "error": f"Missing field: {field}"
+                }
+            ), 400
+
+    try:
+        new_client = Client(
+            first_name=data["first_name"],
+            last_name=data["last_name"],
+            address=data["address"],
+            contact=data["contact"],
+            email=data["email"],
+        )
+        db.session.add(new_client)
+        db.session.commit()
+    except Exception as e:
+        return jsonify(
+            {
+                "success": False,
+                "error": str(e)
+            }
+        ), 500
+
+    return jsonify(
+        {
+            "success": True,
+            "data": new_client.to_dict()
+        }
+    ), 201
