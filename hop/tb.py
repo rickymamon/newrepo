@@ -73,3 +73,6 @@ def test_delete_client(client):
         response = client.delete("/client/1")
         assert response.status_code == 204
         assert response.data == b''
+
+if __name__ == '__main__':
+    app.run(debug=True)
