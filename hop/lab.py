@@ -114,3 +114,15 @@ def update_client(id):
 
     data = request.get_json()
     updatable_fields = ["first_name", "last_name", "address", "contact", "email"]
+    
+    for field in updatable_fields:
+        if field in data:
+            setattr(client, field, data[field])
+
+    db.session.commit()
+    return jsonify(
+        {
+            "success": True,
+            "data": client.to_dict()
+        }
+    ), 200
